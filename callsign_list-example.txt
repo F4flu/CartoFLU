@@ -1,0 +1,11 @@
+# Liste d'appel CartoFLU — ADRASEC 25
+# Un indicatif par ligne
+# Les lignes commençant par # sont ignorées
+# Les lignes vides sont ignorées
+
+F1XYZ
+F4FLU
+F5XYZ
+
+
+
