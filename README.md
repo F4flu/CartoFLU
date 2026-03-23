@@ -29,7 +29,7 @@ Elle fonctionne directement dans le navigateur, sans installation, sans serveur 
 - Gestion d'un tableau de stations actives
 - **Watchdog timer** configurable par station avec alertes visuelles
 - Gestion des départs et alertes de non-réponse
-- Entrée **BALISE** permanente représentant la position du renard
+- Entrée **BALISE** représentant la position de la balise
 
 ### 📡 Intégration APRS
 - Affichage des stations APRS sur la carte
