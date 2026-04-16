@@ -195,7 +195,28 @@ function applySession(d) {
     const lon2 = b.lon*Math.PI/180 + Math.atan2(Math.sin(rad)*Math.sin(len/R)*Math.cos(b.lat*Math.PI/180), Math.cos(len/R)-Math.sin(b.lat*Math.PI/180)*Math.sin(lat2));
     const endLat = lat2*180/Math.PI, endLon = lon2*180/Math.PI;
 
-    const line = L.polyline([[b.lat,b.lon],[endLat,endLon]], { color, weight:2, opacity:0.9 });
+    // QRK line weight
+    const q = parseInt(b.qrk) || 0;
+    const lineWeight = (q >= 51 && q <= 59) ? 2 + (q-51)*0.5 : 2.5;
+
+    const line = L.polyline([[b.lat,b.lon],[endLat,endLon]], { color, weight:lineWeight, opacity:0.9 });
+
+    // Flèche au bout du relevé
+    const arrowIcon = L.divIcon({
+      html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" style="transform:rotate(${b.bearing}deg);transform-origin:center">
+        <polygon points="14,0 20,16 14,12 8,16" fill="${color}" opacity="0.9"/>
+      </svg>`,
+      iconSize:[28,28], iconAnchor:[14,14], className:''
+    });
+    L.marker([endLat,endLon], { icon: arrowIcon, interactive:false }).addTo(map);
+
+    // Label au bout de ligne
+    const endLabel = L.divIcon({
+      html: `<div style="font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:700;color:${color};text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;white-space:nowrap;pointer-events:none;">${b.callsign}#${b.id} ${b.bearing}°${q>=51?' S'+(q-50):''}</div>`,
+      iconSize:[0,0], iconAnchor:[0,0], className:''
+    });
+    L.marker([endLat,endLon], { icon: endLabel, interactive:false }).addTo(map);
+
     const stIcon = L.divIcon({
       html: `<div style="position:relative;width:0;height:0;overflow:visible;">
         <div style="position:absolute;width:12px;height:12px;border-radius:50%;background:${color};border:2px solid #0a0e14;box-shadow:0 0 10px ${color};transform:translate(-6px,-6px);"></div>
@@ -233,7 +254,19 @@ function applySession(d) {
 
   // Balise
   if (d.balise) {
-    const bIcon = L.divIcon({ html:`<svg width="24" height="24" viewBox="0 0 24 24"><line x1="12" y1="0" x2="12" y2="24" stroke="#ff2d55" stroke-width="3"/><line x1="0" y1="12" x2="24" y2="12" stroke="#ff2d55" stroke-width="3"/></svg>`, className:'', iconAnchor:[12,12] });
+    const svgCross = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+      <circle cx="18" cy="18" r="16" fill="rgba(40,0,0,0.85)" stroke="#ff2d55" stroke-width="2"/>
+      <line x1="9" y1="9" x2="27" y2="27" stroke="#ff2d55" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="27" y1="9" x2="9" y2="27" stroke="#ff2d55" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="18" cy="18" r="3" fill="#ff2d55"/>
+    </svg>`;
+    const bIcon = L.divIcon({
+      html: `<div style="position:relative;width:0;height:0;overflow:visible;">
+        ${svgCross}
+        <div style="position:absolute;left:40px;top:-4px;font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;letter-spacing:2px;color:#ff2d55;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;white-space:nowrap;pointer-events:none;">BALISE</div>
+      </div>`,
+      iconSize:[0,0], iconAnchor:[18,18], className:''
+    });
     balisMarker = L.marker([d.balise.lat, d.balise.lon], { icon: bIcon })
       .bindPopup(`<div class="popup-title" style="color:#ff2d55">✚ BALISE — Position fox</div><div class="popup-meta">Lat : ${d.balise.lat.toFixed(5)}<br>Lon : ${d.balise.lon.toFixed(5)}</div>`)
       .addTo(map);
