@@ -74,6 +74,17 @@
   #connectBar button:hover { background:#2ea043; }
   #connectBar .hint { font-size:11px; color:#8b949e; }
 
+  /* COORD BAR */
+  #coordBar {
+    background:#0d1117; border-top:1px solid #30363d;
+    padding:5px 14px; font-family:'Share Tech Mono',monospace;
+    font-size:15px; display:flex; gap:16px; align-items:center;
+    flex-shrink:0; flex-wrap:wrap; color:#8b949e; min-height:32px;
+  }
+  #coordBar span { color:#e6edf3; }
+  #coordBar .lbl { font-size:10px; color:#58a6ff; letter-spacing:1px; margin-right:4px; }
+  #coordBar .waiting { color:#444; font-style:italic; }
+
   /* POPUP OVERRIDES */
   .leaflet-popup-content-wrapper {
     background:#161b22; color:#e6edf3; border:1px solid #30363d;
@@ -119,6 +130,8 @@
   <div class="leg-item"><div class="leg-dot" style="background:#ff2d55;border-radius:0"></div><span>Position balise (fox)</span></div>
   <div class="leg-item"><span style="font-size:14px">🚫</span><span>Écoute négative</span></div>
 </div>
+
+<div id="coordBar"><span class="waiting">Déplacez la souris sur la carte…</span></div>
 
 <script>
 // ── CARTE ──────────────────────────────────────────────────────────────────
@@ -183,7 +196,14 @@ function applySession(d) {
     const endLat = lat2*180/Math.PI, endLon = lon2*180/Math.PI;
 
     const line = L.polyline([[b.lat,b.lon],[endLat,endLon]], { color, weight:2, opacity:0.9 });
-    const dot = L.circleMarker([b.lat,b.lon], { radius:6, color, fillColor:color, fillOpacity:1, weight:2 });
+    const stIcon = L.divIcon({
+      html: `<div style="position:relative;width:0;height:0;overflow:visible;">
+        <div style="position:absolute;width:12px;height:12px;border-radius:50%;background:${color};border:2px solid #0a0e14;box-shadow:0 0 10px ${color};transform:translate(-6px,-6px);"></div>
+        <div style="position:absolute;left:10px;top:-12px;font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;letter-spacing:2px;color:${color};text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;white-space:nowrap;pointer-events:none;">${b.callsign} <span style="font-size:14px;opacity:0.7">#${b.id}</span></div>
+      </div>`,
+      iconSize:[0,0], iconAnchor:[0,0], className:''
+    });
+    const dot = L.marker([b.lat,b.lon], { icon: stIcon });
 
     const popup = `<div class="popup-title" style="color:${color}">${b.callsign} #${b.id}</div>
       <div class="popup-meta">Az : ${b.bearing}° ± ${b.uncertainty||0}°<br>
@@ -222,9 +242,22 @@ function applySession(d) {
   // Écoutes négatives
   (d.negListenings || []).forEach(n => {
     const color = n.color || '#ff2d55';
+    const svgEar = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="rgba(20,0,0,0.82)" stroke="${color}" stroke-width="2"/>
+      <g stroke="#ff2d55" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M62 22 C75 22 82 33 82 46 C82 58 76 65 68 72 C64 76 62 80 62 84 C62 86 60 88 57 88 C53 88 51 85 51 82"/>
+        <path d="M51 62 C54 58 60 54 60 46 C60 38 54 32 47 32 C40 32 35 38 35 46 C35 52 39 57 44 60"/>
+        <circle cx="47" cy="72" r="3.5" fill="#ff2d55" stroke="none"/>
+        <path d="M35 46 C35 68 42 80 51 82"/>
+      </g>
+      <line x1="18" y1="18" x2="82" y2="82" stroke="#ff2d55" stroke-width="6" stroke-linecap="round"/>
+    </svg>`;
     const icon = L.divIcon({
-      html:`<div style="font-size:22px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.7))">🚫</div>`,
-      className:'', iconAnchor:[11,11]
+      html: `<div style="position:relative;width:0;height:0;overflow:visible;">
+        ${svgEar}
+        <div style="position:absolute;left:38px;top:-12px;font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:700;letter-spacing:2px;color:${color};text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;white-space:nowrap;pointer-events:none;">${n.callsign}</div>
+      </div>`,
+      iconSize:[0,0], iconAnchor:[20,20], className:''
     });
     const m = L.marker([n.lat, n.lon], { icon })
       .bindPopup(`<div class="popup-title" style="color:#ff2d55">🚫 ${n.callsign}</div><div class="popup-meta">Écoute négative<br>Lat : ${n.lat.toFixed(5)}<br>Lon : ${n.lon.toFixed(5)}<br>${n.timestamp ? n.timestamp.replace('T',' ') : ''}</div>`)
@@ -236,8 +269,13 @@ function applySession(d) {
   (d.sendMarkers || []).forEach(sm => {
     const color = sm.color || '#00d4ff';
     const icon = L.divIcon({
-      html:`<div style="background:${color};color:#000;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;border:1px solid rgba(0,0,0,0.3)">➤ ${sm.callsign}</div>`,
-      className:'', iconAnchor:[0,10]
+      html:`<div style="position:relative;width:0;height:0;overflow:visible;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+          <polygon points="28,14 8,4 12,14 8,24" fill="${color}" stroke="#0a0e14" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <div style="position:absolute;left:30px;top:-4px;font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;letter-spacing:2px;color:${color};text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;white-space:nowrap;pointer-events:none;">${sm.callsign}</div>
+      </div>`,
+      iconSize:[0,0], iconAnchor:[0,14], className:''
     });
     const m = L.marker([sm.lat, sm.lon], { icon })
       .bindPopup(`<div class="popup-title" style="color:${color}">➤ ${sm.callsign}</div><div class="popup-meta">Lat : ${sm.lat.toFixed(5)}<br>Lon : ${sm.lon.toFixed(5)}</div>`)
@@ -369,6 +407,71 @@ window.addEventListener('load', () => {
 // Touche Entrée dans le champ ID
 document.getElementById('peerIdInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') connect();
+});
+
+// ── COORDONNÉES ────────────────────────────────────────────────────────────
+function ddToDMS(deg, isLat) {
+  const abs = Math.abs(deg);
+  const d = Math.floor(abs);
+  const mFull = (abs - d) * 60;
+  const m = Math.floor(mFull);
+  const s = Math.round((mFull - m) * 60);
+  const dir = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
+  return `${d}° ${String(m).padStart(2,'0')}′ ${String(s).padStart(2,'0')}″ ${dir}`;
+}
+
+function ddToUTM(lat, lon) {
+  const k0=0.9996,a=6378137.0,e=0.0818191908426;
+  const e2=e*e,e4=e2*e2,e6=e4*e2;
+  const latR=lat*Math.PI/180,lonR=lon*Math.PI/180;
+  const zone=Math.floor((lon+180)/6)+1;
+  const lonOriginR=((zone-1)*6-180+3)*Math.PI/180;
+  const eccPrime2=e2/(1-e2);
+  const N=a/Math.sqrt(1-e2*Math.sin(latR)**2);
+  const T=Math.tan(latR)**2,C=eccPrime2*Math.cos(latR)**2,A=Math.cos(latR)*(lonR-lonOriginR);
+  const M=a*((1-e2/4-3*e4/64-5*e6/256)*latR-(3*e2/8+3*e4/32+45*e6/1024)*Math.sin(2*latR)+(15*e4/256+45*e6/1024)*Math.sin(4*latR)-(35*e6/3072)*Math.sin(6*latR));
+  const easting=Math.round(k0*N*(A+(1-T+C)*A**3/6+(5-18*T+T**2+72*C-58*eccPrime2)*A**5/120)+500000);
+  const northing=Math.round(k0*(M+N*Math.tan(latR)*(A**2/2+(5-T+9*C+4*C**2)*A**4/24+(61-58*T+T**2+600*C-330*eccPrime2)*A**6/720))+(lat<0?10000000:0));
+  const band='CDEFGHJKLMNPQRSTUVWXX'[Math.floor((lat+80)/8)]||'Z';
+  return `${zone}${band} ${easting}E ${northing}N`;
+}
+
+function ddToMGRS(lat, lon) {
+  const k0=0.9996,a=6378137.0,e=0.0818191908426;
+  const e2=e*e,e4=e2*e2,e6=e4*e2;
+  const latR=lat*Math.PI/180,lonR=lon*Math.PI/180;
+  const zone=Math.floor((lon+180)/6)+1;
+  const lonOriginR=((zone-1)*6-180+3)*Math.PI/180;
+  const eccPrime2=e2/(1-e2);
+  const N2=a/Math.sqrt(1-e2*Math.sin(latR)**2);
+  const T2=Math.tan(latR)**2,C2=eccPrime2*Math.cos(latR)**2,A2=Math.cos(latR)*(lonR-lonOriginR);
+  const M2=a*((1-e2/4-3*e4/64-5*e6/256)*latR-(3*e2/8+3*e4/32+45*e6/1024)*Math.sin(2*latR)+(15*e4/256+45*e6/1024)*Math.sin(4*latR)-(35*e6/3072)*Math.sin(6*latR));
+  const easting=k0*N2*(A2+(1-T2+C2)*A2**3/6+(5-18*T2+T2**2+72*C2-58*eccPrime2)*A2**5/120)+500000;
+  const northing=k0*(M2+N2*Math.tan(latR)*(A2**2/2+(5-T2+9*C2+4*C2**2)*A2**4/24+(61-58*T2+T2**2+600*C2-330*eccPrime2)*A2**6/720))+(lat<0?10000000:0);
+  const band='CDEFGHJKLMNPQRSTUVWXX'[Math.floor((lat+80)/8)]||'Z';
+  const rowLetters='ABCDEFGHJKLMNPQRSTUV';
+  const setNum=(zone-1)%6;
+  const colSets=['ABCDEFGH','JKLMNPQR','STUVWXYZ','ABCDEFGH','JKLMNPQR','STUVWXYZ'];
+  const colLetter=colSets[setNum][Math.floor(easting/100000)-1]||'?';
+  const rowOffset=(zone%2===0)?5:0;
+  const rowIdx=(Math.floor(northing/100000)+rowOffset)%20;
+  const rowLetter=rowLetters[rowIdx]||'?';
+  const e5=String(Math.round(easting%100000)).padEnd(5,'0');
+  const n5=String(Math.round(northing%100000)).padEnd(5,'0');
+  return `${zone}${band} ${colLetter}${rowLetter} ${e5} ${n5}`;
+}
+
+map.on('mousemove', e => {
+  const lat = e.latlng.lat, lng = e.latlng.lng;
+  document.getElementById('coordBar').innerHTML =
+    `<span><span class="lbl">DD</span><span>${lat.toFixed(5)}° N  ${lng.toFixed(5)}° E</span></span>` +
+    `<span><span class="lbl">DMS</span><span>${ddToDMS(lat,true)}  ${ddToDMS(lng,false)}</span></span>` +
+    `<span><span class="lbl">UTM</span><span>${ddToUTM(lat,lng)}</span></span>` +
+    `<span><span class="lbl">MGRS</span><span>${ddToMGRS(lat,lng)}</span></span>`;
+});
+
+map.on('mouseout', () => {
+  document.getElementById('coordBar').innerHTML = '<span class="waiting">Déplacez la souris sur la carte…</span>';
 });
 </script>
 </body>
