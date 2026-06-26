@@ -9,7 +9,7 @@ Développée par F4FLU / Christophe Chalandre /· ADRASEC 25 (Doubs)
 
 CartoFLU est une application **HTML autonome** (un seul fichier) permettant de gérer une opération de radiogoniométrie en temps réel. Elle a été conçue pour les exercices et interventions de recherche de balise de détresse organisés par les ADRASEC.
 
-Elle fonctionne directement dans le navigateur, sans installation, sans serveur back-end. Une simple connexion internet suffit pour charger les tuiles cartographiques (mode hors-ligne également disponible).
+Elle fonctionne directement dans le navigateur sans installation. Une simple connexion internet suffit pour charger les tuiles cartographiques (mode hors-ligne également disponible).
 
 ---
 
@@ -20,10 +20,8 @@ Elle fonctionne directement dans le navigateur, sans installation, sans serveur 
 - Saisie de relevés azimutaux par station
 - Calcul et affichage des **intersections** des lignes de gisement
 - Marqueurs de station personnalisés avec couleur unique par indicatif
-- **Écoute négative** : marqueur dédié (oreille barrée) désactivant les champs azimut
-- Marqueur **BALISE**  avec croix rouge permanente
-- Menu contextuel clic-droit pour positionner une station directement sur la carte
-- Marqueurs flèches déplaçables par glisser-déposer
+- **Écoute négative** : marqueur dédié (oreille barrée) 
+- Marqueur **BALISE** 
 
 ### 📋 Appel nominal (Roll Call)
 - Gestion d'un tableau de stations actives
@@ -35,7 +33,7 @@ Elle fonctionne directement dans le navigateur, sans installation, sans serveur 
 - Affichage des stations APRS sur la carte
 - Indicatif + temps écoulé depuis la dernière trame
 - Masquage individuel de stations avec liste triée des indicatifs cachés
-- Panneau APRS masquable
+  
 
 ### 💾 Sauvegarde 
 - **Autosauvegarde** configurable (15 s / 30 s / 1 min / 5 min)
@@ -47,9 +45,8 @@ Elle fonctionne directement dans le navigateur, sans installation, sans serveur 
 - Couleurs uniques automatiquement assignées à chaque indicatif
 
 ### 🌐 Mode hors-ligne
-- Serveur de tuiles local via script Python + lanceur `.bat`
-- Basemap **"📴 Local (hors ligne)"** disponible dans le sélecteur de fonds de carte
-
+- Serveur de tuiles local via script Python 
+  
 ---
 
 ## Utilisation
