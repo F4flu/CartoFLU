@@ -1,0 +1,14 @@
+# Emplacement : .github/FUNDING.yml  (sur la branche par defaut du depot)
+# Affiche automatiquement un bouton "Sponsor" en haut de la page du depot.
+#
+# Remplacez "f4flu" ci-dessous par votre identifiant Buy Me a Coffee :
+# c'est la fin de votre URL -> https://www.buymeacoffee.com/VOTRE_ID
+
+buy_me_a_coffee: f4flu
+
+# --- Options supplementaires (retirez le # pour activer) ---
+# github: [f4flu]                                 # si GitHub Sponsors est active sur votre compte
+# custom: ["https://f4flu.github.io/CartoFLU"]    # jusqu'a 4 URL personnalisees
+# ko_fi: votre_identifiant
+# liberapay: votre_identifiant
+# paypal via custom : custom: ["https://paypal.me/votre_identifiant"]
