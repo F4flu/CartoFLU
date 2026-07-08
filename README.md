@@ -30,7 +30,7 @@ Elle fonctionne directement dans le navigateur sans installation. Une simple con
 - Entrée **BALISE** représentant la position de la balise
 
 ### 📡 Intégration APRS
-- Affichage des stations APRS sur la carte
+- Affichage des stations APRS sur la carte (via internet ou réseau radio)
 - Indicatif + temps écoulé depuis la dernière trame
 - Masquage individuel de stations avec liste triée des indicatifs cachés
   
@@ -57,9 +57,9 @@ Elle fonctionne directement dans le navigateur sans installation. Une simple con
 
 ### Démarrage rapide
 
-1. **Télécharger** le fichier `CartoFLU.html`
-2. **L'ouvrir** dans votre navigateur (double-clic ou glisser dans le navigateur)
-3. *(Optionnel)* Charger un fichier `callsign_list.txt` pour l'autocomplétion des indicatifs
+1. **Télécharger** le zip de la dernière release et l'extraire dans le dossier de votre choix
+2. **Ouvrir** le fichier CartoFLU-vxxx dans votre navigateur (double-clic ou glisser dans le navigateur)
+3. *Optionnel* lancer le fichier "lancer_serveurs_python.bat" pour utiliser la connexion APRS et les fonds de cartes hors ligne
 
 C'est tout. Aucune installation requise.
 
@@ -68,7 +68,7 @@ C'est tout. Aucune installation requise.
 Pour une utilisation sans internet (terrain, exercice isolé) :
 
 1. Télécharger les tuiles OSM localement, avec Mobile Atlas Créator par exemple
-2. Lancer `serveur_tuiles.bat` (à placer à la racine du dossier des tuiles) — démarre un serveur Python sur `localhost:8080`
+2. Placer les tuiles dans un sous dossier nommé "tuiles", à coté du fichier "lancer_serveurs_python.bat"
 3. Dans CartoFLU, sélectionner le fond de carte **"📴 Local (hors ligne)"**
 
 ### Fichier callsign_list.txt
@@ -90,10 +90,15 @@ Un exemple de fichier est fourni dans le dépôt (`callsign_list.example.txt`).
 
 ```
 CartoFLU/
-├── CartoFLU.html              # Application principale (fichier unique)
-├── callsign_list-example.txt  # Exemple de liste d'indicatifs
-├── serveur_tuiles.bat            # Serveur de tuiles hors-ligne
+├── python-portable               # Dossier python portable
+├── tuiles                        # Dossier contenant les tuiles (mode hors ligne) avec un sous dossier par niveau de zoom
+├── CartoFLU-vxxx.html            # Application principale (fichier unique)
+├── callsign_list-example.txt     # Exemple de liste d'indicatifs
+├── lancer_serveurs_python.bat    # Serveur de tuiles hors-ligne et APRS
+├── cartoflu_serveur.py           # Script python pour le serveur
+├── CartoFLU_Documentation_vxxx   # Documentation
 └── README.md
+
 ```
 
 ---
